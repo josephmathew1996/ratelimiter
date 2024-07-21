@@ -9,7 +9,7 @@ import (
 )
 
 // RateLimiterMiddleware is an Echo middleware function for rate limiting
-func RateLimiterMiddleware(rateLimiter *ratelimiter.FixedWindowRateLimiter, enabled bool, logger *zap.SugaredLogger) echo.MiddlewareFunc {
+func RateLimiterMiddleware(rateLimiter *ratelimiter.FixedWindowClientsRateLimiter, enabled bool, logger *zap.SugaredLogger) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			if enabled {
@@ -25,4 +25,4 @@ func RateLimiterMiddleware(rateLimiter *ratelimiter.FixedWindowRateLimiter, enab
 			return next(c)
 		}
 	}
-} 
+}

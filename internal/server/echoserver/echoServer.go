@@ -1,7 +1,6 @@
 package echo
 
 import (
-	"fmt"
 	"ratelimiter/internal/config"
 	"ratelimiter/internal/logger"
 	"ratelimiter/internal/middlewares"
@@ -24,26 +23,23 @@ func NewEchoServer() (*EchoServer, error) {
 	// Initialize configuration
 	cfg := config.InitializeConfig()
 
-	fmt.Println("ratelimter config", cfg.RateLimiter)
 	// Initialize logger
 	log, err := logger.InitializeLogger(cfg.App.LogLevel)
 	if err != nil {
 		return nil, err
 	}
 
-	// Rate limiter for clients
-	// rateLimiter := ratelimiter.NewFixedWindowClientsRateLimiter(
-	// 	cfg.RateLimiter.RequestsPerTimeFrame,
-	// 	cfg.RateLimiter.TimeFrame,
-	// )
-
-	// Rate limiter for server
-	rateLimiter := ratelimiter.NewFixedWindowRateLimiter(
+	// Rate limiter for per client
+	rateLimiter := ratelimiter.NewFixedWindowClientsRateLimiter(
 		cfg.RateLimiter.RequestsPerTimeFrame,
 		cfg.RateLimiter.TimeFrame,
 	)
 
-	fmt.Printf("rateLimiter =%+v\n", rateLimiter)
+	// Rate limiter for whole server
+	// rateLimiter := ratelimiter.NewFixedWindowRateLimiter(
+	// 	cfg.RateLimiter.RequestsPerTimeFrame,
+	// 	cfg.RateLimiter.TimeFrame,
+	// )
 
 	e := echo.New()
 	e.Use(middleware.Logger())
@@ -51,7 +47,6 @@ func NewEchoServer() (*EchoServer, error) {
 	e.Use(middlewares.RateLimiterMiddleware(rateLimiter, cfg.RateLimiter.Enabled, log))
 	// e.Use(middlewares.SampleEchoMiddleware)
 	// e.Use(middlewares.SampleEchoMiddlewareWithArgs("arg1"))
-
 
 	return &EchoServer{
 		Config:      cfg,
